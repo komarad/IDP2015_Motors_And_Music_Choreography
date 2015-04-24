@@ -49,7 +49,7 @@ void loop(){
   
   if(millisReading - nextBeatAt >= 0 && millisReading - nextBeatAt <= 20) {
     
-    int distanceTraveled = previousAtBeat - analogRead(A1);
+    /*int distanceTraveled = previousAtBeat - analogRead(A1);
     int distanceExpected = myBeatPositions[atBeat > 0 ? atBeat - 1 : numBeats - 1] - myBeatPositions[atBeat];
     int signA = 0;
     if (distanceTraveled < 0) {signA = -1;}
@@ -58,14 +58,13 @@ void loop(){
     int signB = 0;
     if (distanceExpected < 0) {signB = -1;}
     else if (distanceExpected==0) {signB = 0;}
-    else {signB = 1;}
+    else {signB = 1;}*/
  
     if(myBeats[atBeat] != 0) {
-      if(myBeatPositions[atBeat] != -1 || abs(distanceTraveled) < 100 || abs(distanceTraveled) > 100 && signA != signB) {
+      //if(myBeatPositions[atBeat] != -1 || abs(distanceTraveled) < 100 || abs(distanceTraveled) > 100 && signA != signB) {
         MotorA.start();
         MotorA.torque(torque * myBeatDirections[atBeat] - (myBeatDirections[atBeat] == 1 ? 20 : 0) /* * myBeatStrength[atBeat]*/);
-      }
-      
+      //}
     }
 
     if(atBeat != previousAtBeat) {
@@ -74,11 +73,11 @@ void loop(){
         myBeatPositions[atBeat] = analogRead(A1);
       }
       
-      Serial.print(abs(distanceTraveled));
+      /*Serial.print(abs(distanceTraveled));
       Serial.print(" ");
       Serial.print(signA);
       Serial.print(" ");
-      Serial.println(signB);        
+      Serial.println(signB);*/       
     }
     
   } else {
@@ -93,19 +92,4 @@ void loop(){
       }
     }
   }
-
-  
-  /*xA = analogRead(A1);
-  Music.setFrequency1(map (xA, 0, 1023, 40, 2000)); 
-  
-  xB = analogRead(A9);
-  Music.setFrequency2(map (xB, 0, 1023, 40, 2000)); 
-  
-  foutA = -6*(xA-xB); // this will peak at x=1024/6
-  MotorA.torque(foutA);  // 1/4 or 1/2 ?
-
-  foutB = -6*(xB-xA); // this will peak at x=1024/6
-  MotorB.torque(foutB);  // 1/4 or 1/2 ?
-
-  Music.setGain(float(abs(xA-xB))/1024.0f);*/
 }
