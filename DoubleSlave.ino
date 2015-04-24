@@ -9,8 +9,9 @@ int const toruqeDuration = 20;
 float const myBeats[numBeats] = {1, 1, .45, .55, 1, 1, 1, .45, .55, 1};
 int const myBeatDirections[numBeats] = {-1, 1, -1, 1, 1, -1, 1, -1, 1, -1};
 int const torque = 330; // normal Torque Value
-int const choreographyCountGoal = 3;
+int const choreographyCountGoal = 1;
 float const torqueResponseWhileDancing = -.65;
+const int connectionMode = 1; // -1 or 1
 
 // Variables
 int xA, xB;
@@ -76,7 +77,7 @@ void loop(){
         MotorA.start();
         MotorA.torque(torque * myBeatDirections[atBeat] - (myBeatDirections[atBeat] == 1 ? 20 : 0) /* * myBeatStrength[atBeat]*/);
         MotorB.start();
-        MotorB.torque(torque * myBeatDirections[atBeat] - (myBeatDirections[atBeat] == 1 ? 20 : 0) /* * myBeatStrength[atBeat]*/);
+        MotorB.torque(connectionMode * torque * myBeatDirections[atBeat] - (myBeatDirections[atBeat] == 1 ? 20 : 0) /* * myBeatStrength[atBeat]*/);
       //}
     }
     
@@ -107,7 +108,8 @@ void loop(){
     }
   } else if (choreographyCount == choreographyCountGoal) {
     choreographyCount = -1;
-    resetPositions();
+    //resetPositions();
+    delay(2000);
     // Prepare to Dance
     MotorA.start();
     MotorA.start();
@@ -115,8 +117,9 @@ void loop(){
       xA = analogRead(A1);
       xB = analogRead(A9);
       dance();
-      if(abs(xA-xB) >= (500)) {
-        //feel increasing heartbeat?
+      if(connectionMode == -1 && abs(xA+xB) > 1400) {
+        awkward2(); 
+      } else if (connectionMode == 1 && abs(xA-xB) >= 800) {
         awkward(); 
       }
   }
@@ -127,17 +130,41 @@ void loop(){
 void dance() { 
   int foutA = torqueResponseWhileDancing*(xA-xB); 
   MotorA.torque(foutA);  
-  int foutB = torqueResponseWhileDancing*(xB-xA); 
+  int foutB = connectionMode * torqueResponseWhileDancing*(xB-xA); 
   MotorB.torque(foutB);   
 } // end of dance()
 
 
 void awkward() {
-  int p = 120;
-  int foutA = -3*(xA-xB); 
-  MotorA.torque(foutA/2);
-  int foutB = -3*(xB-xA); 
-  MotorB.torque(foutB/2); 
+    xA = analogRead(A1);
+    xB = analogRead(A9);  
+    int p = 120;
+    int foutA = -3*(xA-xB); 
+    MotorA.torque(foutA/2);  
+    int foutB = -3*(xB-xA); 
+    MotorB.torque(foutB/2); 
+    MotorA.start();
+    MotorB.start();
+    MotorA.torque(foutA + p);
+    MotorB.torque(foutB + p);
+    delay (10);
+    MotorA.torque(0);
+    MotorB.torque(0);
+    delay (175);
+    MotorA.torque(foutA - p);
+    MotorB.torque(foutB - p);
+    delay (20);
+    MotorA.torque(0);
+    MotorB.torque(0);
+    delay (375);
+} // end of awkward()
+
+void awkward2() {
+  xA = analogRead(A1);
+  xB = analogRead(A9);  
+  int p = 0;
+  int foutA = -1*(1200-abs(xA-xB)); 
+  int foutB = -1*(1200-abs(xA-xB)); 
   MotorA.start();
   MotorB.start();
   MotorA.torque(foutA + p);
@@ -153,5 +180,4 @@ void awkward() {
   MotorB.torque(0);
   delay (375);
 } // end of awkward()
-
 
