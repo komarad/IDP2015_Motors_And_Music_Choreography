@@ -22,6 +22,14 @@ int previousAtBeat = -1;
 int millisReading = 0;
 int choreographyCount = 0; // how many times we "choreographed"
 
+// for our new audio accents
+int xA_old, xB_old; 
+boolean stepping = false;
+int stepThreshold = 75;
+int stepA_dist, stepB_dist;
+long prevTime;
+// end audio additions
+
 //int myBeatPositions[numBeats] = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
 //int myLastPosition = -1;
 //float const FULL_STRENGTH = 1;
@@ -34,6 +42,10 @@ void setup(){
   Serial.begin(9600);
   MotorA.init();
   MotorB.init();
+  Music.init();
+  Music.setGain(0);
+  prevTime = millis();
+  
   analogReadAveraging(32);
   resetPositions();
 } // end of 
@@ -117,6 +129,8 @@ void loop(){
       xA = analogRead(A1);
       xB = analogRead(A9);
       dance();
+      steppingSound(); // calls the audio function
+      
       if(connectionMode == -1 && abs(xA+xB) > 1400) {
         awkward2(); 
       } else if (connectionMode == 1 && abs(xA-xB) >= 800) {
@@ -148,6 +162,24 @@ void awkward() {
     MotorA.torque(foutA + p);
     MotorB.torque(foutB + p);
     delay (10);
+    
+    // ADDED MUSIC STUFF HERE
+    Music.setWaveform1(TRIANGLE);
+    Music.setWaveform2(SINE);
+    Music.setWaveform3(SINE);
+    Music.setFrequency1(50);
+    Music.setFrequency2(80);
+    Music.setFrequency3(65);
+    Music.setGain1(0.001 * stepA_dist);
+    Music.setGain2(0.001 * stepB_dist);
+    Music.setGain2(0.001 * stepB_dist);
+    Music.setGain1(0.001 * stepA_dist);
+    Music.setGain3(0.001 * stepB_dist);
+    Music.setGain3(0.001 * stepA_dist);
+    Music.setPortamento(39);
+    Serial.println("wobble");
+    // END AUDIO ADDITIONS
+    
     MotorA.torque(0);
     MotorB.torque(0);
     delay (175);
@@ -180,4 +212,50 @@ void awkward2() {
   MotorB.torque(0);
   delay (375);
 } // end of awkward()
+
+void steppingSound(){ //  a new function for audio
+  stepA_dist = abs(xA_old - xA);
+  stepB_dist = abs(xB_old - xB);
+
+  if (stepA_dist >= stepThreshold) {
+
+    stepping = true;
+
+    Music.setWaveform1(SAW);
+    Music.setWaveform2(SINE);
+    Music.setWaveform3(TAN1);
+    Music.setFrequency1(12000);
+    Music.setFrequency2(280);
+    Music.setFrequency3(561);
+    Music.setGain1(0.00001 * stepA_dist);
+    Music.setGain2(0.00001 * stepA_dist);
+    Music.setGain3(0.00001 * stepA_dist);
+    Serial.println("stepping soundA");
+
+  } else if (stepB_dist >= stepThreshold) {
+
+    stepping = true;
+
+    Music.setWaveform1(SAW);
+    Music.setWaveform2(SINE);
+    Music.setFrequency1(10000);
+    Music.setFrequency2(468);
+    Music.setGain1(0.00001 * stepB_dist);
+    Music.setGain2(0.00001 * stepB_dist);
+    Serial.println("stepping soundB");
+
+  } else {
+    stepping = false; 
+  }
+
+  if (stepping == false) {
+    Music.setGain(0.6995f*Music.getGain());
+  }
+  
+  if(millis() - prevTime >= 500){
+    xA_old = xA;
+    xB_old = xB;
+    prevTime = millis();
+  }
+}
 
