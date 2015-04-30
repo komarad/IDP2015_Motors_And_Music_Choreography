@@ -152,7 +152,7 @@ void dance() {
 void awkward() {
     xA = analogRead(A1);
     xB = analogRead(A9);  
-    int p = 120;
+    int p = 300;
     int foutA = -3*(xA-xB); 
     MotorA.torque(foutA/2);  
     int foutB = -3*(xB-xA); 
@@ -167,15 +167,15 @@ void awkward() {
     Music.setWaveform1(TRIANGLE);
     Music.setWaveform2(SINE);
     Music.setWaveform3(SINE);
-    Music.setFrequency1(50);
-    Music.setFrequency2(80);
+    Music.setFrequency1(150);
+    Music.setFrequency2(100);
     Music.setFrequency3(65);
-    Music.setGain1(0.001 * stepA_dist);
-    Music.setGain2(0.001 * stepB_dist);
-    Music.setGain2(0.001 * stepB_dist);
-    Music.setGain1(0.001 * stepA_dist);
-    Music.setGain3(0.001 * stepB_dist);
-    Music.setGain3(0.001 * stepA_dist);
+    Music.setGain1(0.1 * stepA_dist);
+    Music.setGain2(0.1 * stepB_dist);
+    Music.setGain2(0.1 * stepB_dist);
+    Music.setGain1(0.1 * stepA_dist);
+    Music.setGain3(0.1 * stepB_dist);
+    Music.setGain3(0.1 * stepA_dist);
     Music.setPortamento(39);
     Serial.println("wobble");
     // END AUDIO ADDITIONS
@@ -224,12 +224,12 @@ void steppingSound(){ //  a new function for audio
     Music.setWaveform1(SAW);
     Music.setWaveform2(SINE);
     Music.setWaveform3(TAN1);
-    Music.setFrequency1(12000);
+    Music.setFrequency1(560 + );
     Music.setFrequency2(280);
     Music.setFrequency3(561);
-    Music.setGain1(0.00001 * stepA_dist);
-    Music.setGain2(0.00001 * stepA_dist);
-    Music.setGain3(0.00001 * stepA_dist);
+    Music.setGain1(0.0001 * stepA_dist);
+    Music.setGain2(0.0001 * stepA_dist);
+    Music.setGain3(0.0001 * stepA_dist);
     Serial.println("stepping soundA");
 
   } else if (stepB_dist >= stepThreshold) {
@@ -238,10 +238,12 @@ void steppingSound(){ //  a new function for audio
 
     Music.setWaveform1(SAW);
     Music.setWaveform2(SINE);
-    Music.setFrequency1(10000);
+    Music.setWaveform3(TAN1);
+    Music.setFrequency1(600);
     Music.setFrequency2(468);
-    Music.setGain1(0.00001 * stepB_dist);
-    Music.setGain2(0.00001 * stepB_dist);
+    Music.setFrequency3(561);
+    Music.setGain1(0.0001 * stepB_dist);
+    Music.setGain2(0.0001 * stepB_dist);
     Serial.println("stepping soundB");
 
   } else {
